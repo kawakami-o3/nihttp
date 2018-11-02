@@ -14,7 +14,7 @@ type Client struct {
 	header map[string]string
 }
 
-func newClient() *Client {
+func NewClient() *Client {
 	jar, _ := cookiejar.New(nil)
 	return &Client{
 		http.Client{
