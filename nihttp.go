@@ -3,6 +3,7 @@ package nihttp
 import (
 	"crypto/tls"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"time"
@@ -57,6 +58,21 @@ func (c *Client) Get(url string) (*http.Response, error) {
 		return nil, err
 	}
 	return resp, nil
+}
+
+func GetString(url string) (string, error) {
+	client := NewClient()
+
+	resp, err := client.Get(url)
+	if err != nil {
+		return "", err
+	}
+
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }
 
 func GetJson(url string, out interface{}) error {
