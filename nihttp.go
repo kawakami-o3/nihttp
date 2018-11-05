@@ -42,8 +42,8 @@ func (c *Client) ClearHeader() *Client {
 	return c
 }
 
-func (c *Client) Get(path string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", path, nil)
+func (c *Client) Get(url string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +57,18 @@ func (c *Client) Get(path string) (*http.Response, error) {
 		return nil, err
 	}
 	return resp, nil
+}
+
+func GetJson(url string, out interface{}) error {
+	client := NewClient()
+
+	resp, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+
+	DecodeJson(resp, out)
+	return nil
 }
 
 func DecodeJson(resp *http.Response, out interface{}) error {
