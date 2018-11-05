@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"time"
 )
 
@@ -13,6 +14,8 @@ type Client struct {
 	http.Client
 
 	header map[string]string
+
+	values url.Values
 }
 
 func NewClient() *Client {
@@ -23,6 +26,7 @@ func NewClient() *Client {
 			Timeout: time.Duration(10) * time.Second,
 		},
 		map[string]string{},
+		url.Values{},
 	}
 }
 
@@ -40,6 +44,16 @@ func (c *Client) AddHeader(key, value string) *Client {
 
 func (c *Client) ClearHeader() *Client {
 	c.header = map[string]string{}
+	return c
+}
+
+func (c *Client) AddValues(key, value string) *Client {
+	c.values.Add(key, value)
+	return c
+}
+
+func (c *Client) ClearValues() *Client {
+	c.values = url.Values{}
 	return c
 }
 
@@ -85,6 +99,17 @@ func GetJson(url string, out interface{}) error {
 
 	DecodeJson(resp, out)
 	return nil
+}
+
+func (c *Client) Post(url string) (*http.Response, error) {
+	resp, err := c.PostForm(url, c.values)
+	if err != nil {
+		return nil, err
+	}
+
+	c.ClearValues()
+
+	return resp, nil
 }
 
 func DecodeJson(resp *http.Response, out interface{}) error {
